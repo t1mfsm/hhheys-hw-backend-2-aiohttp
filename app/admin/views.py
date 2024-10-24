@@ -1,14 +1,19 @@
 from aiohttp import request, ClientSession
+from aiohttp_apispec import response_schema, request_schema
 from aiohttp_session import get_session, session_middleware, cookie_storage, new_session, AbstractStorage
 
+from app.admin.schemes import AdminSchema
 from app.web.app import View
 from app.web.mixins import AuthRequiredMixin
+from app.web.schemes import OkResponseSchema
 from app.web.utils import json_response
 
 from aiohttp.web_exceptions import HTTPForbidden
 
 
 class AdminLoginView(View):
+    @request_schema(AdminSchema)
+    @response_schema(OkResponseSchema)
     async def post(self):
         data = await self.request.json()
         if await self.request.app.store.admins.validate_admin(data["email"], data["password"]):

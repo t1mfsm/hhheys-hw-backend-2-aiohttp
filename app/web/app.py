@@ -49,12 +49,12 @@ app = Application()
 
 
 def setup_app(config_path: str) -> Application:
-    setup_logging(app)
+    # setup_logging(app)
     setup_config(app, config_path)
     setup_routes(app)
     setup_middlewares(app)
     setup_store(app)
     setup(app, cookie_storage.EncryptedCookieStorage(
         b'Thirty  two  length  bytes  key.'))
-
+    setup_aiohttp_apispec(app, title="CRM Application", url="/docs/json", swagger_path="/docs")
     return app

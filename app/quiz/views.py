@@ -1,7 +1,7 @@
 from aiohttp_apispec import request_schema, response_schema, docs, querystring_schema
 
 from app.quiz.models import Question
-from app.quiz.schemes import ThemeSchema, QuestionSchema
+from app.quiz.schemes import ThemeSchema, QuestionSchema, ListQuestionSchema
 from app.web.app import View
 from app.web.mixins import AuthRequiredMixin
 from app.web.schemes import OkResponseSchema
@@ -37,9 +37,9 @@ class ThemeListView(View, AuthRequiredMixin):
         return json_response(data={"themes":data})
 
 
-# @response_schema(QuestionSchema)
-# @request_schema(OkResponseSchema)
 class QuestionAddView(View, AuthRequiredMixin):
+    @request_schema(QuestionSchema)
+    @response_schema(OkResponseSchema)
     async def post(self):
         await self.check_auth(self.request)
         data = await self.request.json()
@@ -50,11 +50,11 @@ class QuestionAddView(View, AuthRequiredMixin):
         if correct_ans != 1 or len(data["answers"]) < 2:
             raise HTTPBadRequest
 
-        if await self.request.app.store.quizzes.get_question_by_title(data["title"]) is not None:
-            raise HTTPConflict
-
         if await self.request.app.store.quizzes.get_theme_by_id(data["theme_id"]) is None:
             raise HTTPNotFound
+
+        if await self.request.app.store.quizzes.get_question_by_title(data["title"]) is not None:
+            raise HTTPConflict
 
         question = await self.request.app.store.quizzes.create_question(title=data["title"], theme_id=data["theme_id"], answers=data["answers"])
 
@@ -65,9 +65,13 @@ class QuestionAddView(View, AuthRequiredMixin):
                       "answers": question.answers
                     })
 
-#@querystring_schema()
-class QuestionListView(View):
+@querystring_schema(ListQuestionSchema)
+@request_schema(OkResponseSchema)
+class QuestionListView(View, AuthRequiredMixin):
     async def get(self):
+        await self.check_auth(self.request)
+        if await self.request.app.store.quizzes.get_theme_by_id(int(self.request.query['theme_id'])) is None:
+            raise HTTPNotFound
         raw_data = await self.request.app.store.quizzes.list_questions(int(self.request.query['theme_id']))
         data = []
         for question in raw_data:
