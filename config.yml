@@ -6,7 +6,7 @@ admin:
   email: admin@admin.com
   password: admin
 bot:
-  token: group_token
-  group_id: 1
+  token: 'vk1.a.nBvOS_5PTYA9_wDXLt8CyXv2KQGt8YqsaCV8JOtyXN32prHmuE5QXD5mfCSKTpe5y7RgbZU4An6wSL1NmrL4LZphPd8-v0sRGC4PDiQb6qVft3ZikR12QJR4f1Z7yiP66zJpgHbVa7lPouo41Ikfdv1V1EU0zi0PG4-Co-6Xx9WCrbGUz1ETjTkfk5K-H7AdLdOXBnSjHbe21Dkx6GJcWg'
+  group_id: 227973314
 
 

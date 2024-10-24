@@ -1,3 +1,5 @@
+from dataclasses import field
+
 from marshmallow import Schema, fields
 
 
@@ -11,7 +13,10 @@ class AnswerSchema(Schema):
 
 
 class QuestionSchema(Schema):
-    pass
+    id = fields.Int(required=False)
+    title = fields.Str(required=True)
+    theme_id = fields.Int(required=True)
+    answers = fields.List(required=True, cls_or_instance=fields.Dict)
 
 
 class ThemeListSchema(Schema):
