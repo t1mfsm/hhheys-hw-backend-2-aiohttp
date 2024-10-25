@@ -26,4 +26,6 @@ class Database:
         return len(self.questions) + 1
 
     def clear(self):
-        self.themes.clear()
+        self.themes = []
+        self.questions = []
+        self.admins = []

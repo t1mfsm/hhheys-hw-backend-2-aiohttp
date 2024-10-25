@@ -58,6 +58,7 @@ class TestQuestionListView:
         assert response.status == 200
 
         data = await response.json()
+        print(data)
         assert data == {
             "status": "ok",
             "data": {
