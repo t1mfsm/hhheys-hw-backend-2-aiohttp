@@ -65,20 +65,24 @@ class QuestionAddView(View, AuthRequiredMixin):
                       "answers": question.answers
                     })
 
-@querystring_schema(ListQuestionSchema)
-@request_schema(OkResponseSchema)
+# @querystring_schema(ListQuestionSchema)
+@response_schema(OkResponseSchema,200)
 class QuestionListView(View, AuthRequiredMixin):
     async def get(self):
         await self.check_auth(self.request)
-        if await self.request.app.store.quizzes.get_theme_by_id(int(self.request.query['theme_id'])) is None:
-            raise HTTPNotFound
-        raw_data = await self.request.app.store.quizzes.list_questions(int(self.request.query['theme_id']))
-        data = []
-        for question in raw_data:
-            data.append({
-                      "id": question.id,
-                      "title": question.title,
-                      "theme_id": question.theme_id,
-                      "answers": question.answers
-            })
-        return json_response(data={"questions": data})
+        if self.request.query.get('theme_id') is not None:
+            if await self.request.app.store.quizzes.get_theme_by_id(int(self.request.query['theme_id'])) is None:
+                raise HTTPNotFound
+            raw_data = await self.request.app.store.quizzes.list_questions(int(self.request.query['theme_id']))
+            data = []
+            for question in raw_data:
+                data.append({
+                          "id": question.id,
+                          "title": question.title,
+                          "theme_id": question.theme_id,
+                          "answers": question.answers
+                })
+            return json_response(data={"questions": data})
+        else:
+            data = []
+            return json_response(data={"questions": data})

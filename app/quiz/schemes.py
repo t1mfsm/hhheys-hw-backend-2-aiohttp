@@ -28,4 +28,4 @@ class ThemeIdSchema(Schema):
 
 
 class ListQuestionSchema(Schema):
-    theme_id = fields.Int(required=True)
+    theme_id = fields.Int()
