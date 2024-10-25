@@ -1,6 +1,6 @@
 from aiohttp_apispec import request_schema, response_schema, docs, querystring_schema
 
-from app.quiz.models import Question
+from app.quiz.models import Question, Answer
 from app.quiz.schemes import ThemeSchema, QuestionSchema, ListQuestionSchema
 from app.web.app import View
 from app.web.mixins import AuthRequiredMixin
@@ -55,14 +55,14 @@ class QuestionAddView(View, AuthRequiredMixin):
 
         if await self.request.app.store.quizzes.get_question_by_title(data["title"]) is not None:
             raise HTTPConflict
-
-        question = await self.request.app.store.quizzes.create_question(title=data["title"], theme_id=data["theme_id"], answers=data["answers"])
+        answers = list(Answer(answer["title"], answer["is_correct"]) for answer in data["answers"])
+        question = await self.request.app.store.quizzes.create_question(title=data["title"], theme_id=data["theme_id"], answers=answers)
 
         return json_response(data={
                       "id": question.id,
                       "title": question.title,
                       "theme_id": question.theme_id,
-                      "answers": question.answers
+                      "answers": list(({"title":answer.title, "is_correct": answer.is_correct}) for answer in question.answers)
                     })
 
 # @querystring_schema(ListQuestionSchema)
@@ -91,6 +91,6 @@ class QuestionListView(View, AuthRequiredMixin):
                     "id": question.id,
                     "title": question.title,
                     "theme_id": question.theme_id,
-                    "answers": question.answers
+                    "answers": [{"title":answer.title, "is_correct":answer.is_correct} for answer in question.answers]
                 })
-            return json_response(data={"questions": questions})
+            return json_response(data={"questions": list(questions)})
