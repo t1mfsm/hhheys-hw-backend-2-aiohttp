@@ -84,5 +84,13 @@ class QuestionListView(View, AuthRequiredMixin):
                 })
             return json_response(data={"questions": data})
         else:
-            data = []
-            return json_response(data={"questions": data})
+            raw_data = await self.request.app.store.quizzes.list_questions()
+            questions = []
+            for question in raw_data:
+                questions.append({
+                    "id": question.id,
+                    "title": question.title,
+                    "theme_id": question.theme_id,
+                    "answers": question.answers
+                })
+            return json_response(data={"questions": questions})
